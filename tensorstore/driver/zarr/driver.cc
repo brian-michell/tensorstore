@@ -280,10 +280,16 @@ internal::ChunkGridSpecification DataCache::GetChunkGridSpecification(
     chunk_fill_value.layout().set_rank(cell_rank);
     chunk_fill_value.element_pointer() = fill_value.element_pointer();
     const DimensionIndex fill_value_start_dim = cell_rank - fill_value.rank();
+    //TODO: Hardcoded!
     for (DimensionIndex cell_dim = 0; cell_dim < fill_value_start_dim;
          ++cell_dim) {
+    if (field_i == 3) {
+      // TODO: Hardcoded!
+      chunk_fill_value.shape()[cell_dim] = 3-cell_dim; 
+    } else {
       chunk_fill_value.shape()[cell_dim] =
           field_layout.full_chunk_shape()[cell_dim];
+    }
       chunk_fill_value.byte_strides()[cell_dim] = 0;
     }
     for (DimensionIndex cell_dim = fill_value_start_dim; cell_dim < cell_rank;
