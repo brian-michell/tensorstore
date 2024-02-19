@@ -478,6 +478,55 @@ class ZarrDriver::OpenState : public ZarrDriver::OpenStateBase {
         ValidateMetadata(metadata, spec().partial_metadata));
     TENSORSTORE_ASSIGN_OR_RETURN(
         auto field_index, GetFieldIndex(metadata.dtype, spec().selected_field));
+    bool as_byte_array = false;
+    if (field_index == metadata.dtype.fields.size()) {
+      as_byte_array = true;
+
+      // std::cout << "Encoded dtype for void 2: " << metadata.dtype.fields[2].encoded_dtype << std::endl;
+      // std::cout << "Inner elements for void 2: " << metadata.dtype.fields[2].num_inner_elements << std::endl;
+      // std::cout << "Byte offset for void 2: " << metadata.dtype.fields[2].byte_offset << std::endl;
+      // std::cout << "Number of bytes for void 2: " << metadata.dtype.fields[2].num_bytes << std::endl;
+      // std::cout << "Field shape for void 2: " << metadata.dtype.fields[2].field_shape.size() << std::endl;
+      // std::cout << "Outer shape for void 2: " << metadata.dtype.fields[2].outer_shape.size() << std::endl;
+
+
+      ZarrDType::Field newField;
+
+      long bytes = 0;
+      for (auto& d : metadata.dtype.fields){
+        bytes += d.num_bytes;
+      }
+
+      newField.encoded_dtype = "|V" + std::to_string(bytes);
+      newField.dtype = DataType(tensorstore::dtype_v<tensorstore::dtypes::byte_t>); // Replace with your actual DataType
+      newField.endian = tensorstore::endian::little; // Or tensorstore::endian::big
+      newField.flexible_shape = {bytes}; // Replace with your actual shape
+
+      newField.outer_shape = {}; // Replace with your actual outer shape
+      newField.name = "";
+      newField.field_shape = {bytes}; // Replace with your actual field shape
+      newField.num_inner_elements = bytes; // Replace with your actual number of inner elements
+      newField.byte_offset = 0; // Replace with your actual byte offset
+      newField.num_bytes = bytes; // Replace with your actual number of bytes
+      
+      auto& non_const_fields = const_cast<std::vector<ZarrDType::Field>&>(metadata.dtype.fields);
+      non_const_fields.push_back(newField);
+
+      auto& non_const_fill_value = const_cast<std::vector<SharedArray<const void>>&>(metadata.fill_value);
+      non_const_fill_value.push_back(SharedArray<const void>());
+
+      // for (auto& d : metadata.dtype.fields){
+      //   std::cout << d.dtype << std::endl;
+      // }
+
+      // auto& updated_metadata = const_cast<ZarrMetadata&>(metadata);
+      // auto& updated_shape = const_cast<std::vector<Index>&>(metadata.shape);
+      // updated_shape.push_back(newField.num_bytes);
+      // // TODO: Is this the correct way to chunk?
+      // auto& updated_chunks = const_cast<std::vector<Index>&>(metadata.chunks);
+      // updated_chunks.push_back(newField.num_bytes);
+
+    }
     TENSORSTORE_RETURN_IF_ERROR(
         ValidateMetadataSchema(metadata, field_index, spec().schema));
     return field_index;
