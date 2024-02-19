@@ -322,6 +322,17 @@ SpecRankAndFieldInfo GetSpecRankAndFieldInfo(const ZarrMetadata& metadata,
   info.field = &metadata.dtype.fields[field_index];
   info.field_rank = info.field->field_shape.size();
   info.full_rank = info.chunked_rank + info.field_rank;
+  if (metadata.dtype.fields.size() == field_index) {
+    std::cout << "This may be an unspecified field struct array!\n";
+    // TODO: Verify this doesn't break singletons and fields with one element
+    // TODO: Remove hardcode
+    info.full_rank = 3;
+  }
+  // std::cout << "Field index is: " << field_index << std::endl;
+  // std::cout << "Chunked rank: " << info.chunked_rank << std::endl;
+  // std::cout << "Field: " << info.field << std::endl;
+  // std::cout << "Field rank: " << info.field_rank << std::endl;
+  // std::cout << "Full rank: " << info.full_rank << std::endl;
   return info;
 }
 
