@@ -256,13 +256,14 @@ Result<std::shared_ptr<const void>> DataCache::GetResizedMetadata(
 
 internal::ChunkGridSpecification DataCache::GetChunkGridSpecification(
     const ZarrMetadata& metadata) {
+  std::size_t num_fields = metadata.dtype.fields.size();
   internal::ChunkGridSpecification::ComponentList components;
-  components.reserve(metadata.dtype.fields.size());
+  components.reserve(num_fields);
   std::vector<DimensionIndex> chunked_to_cell_dimensions(
       metadata.chunks.size());
   std::iota(chunked_to_cell_dimensions.begin(),
             chunked_to_cell_dimensions.end(), static_cast<DimensionIndex>(0));
-  for (std::size_t field_i = 0; field_i < metadata.dtype.fields.size();
+  for (std::size_t field_i = 0; field_i < num_fields;
        ++field_i) {
     const auto& field = metadata.dtype.fields[field_i];
     const auto& field_layout = metadata.chunk_layout.fields[field_i];
