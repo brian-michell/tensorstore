@@ -411,9 +411,11 @@ absl::Status ValidateMetadataSchema(const ZarrMetadata& metadata,
   const auto& field = metadata.dtype.fields[field_index];
 
   if (!RankConstraint::EqualOrUnspecified(schema.rank(), info.full_rank)) {
-    return absl::FailedPreconditionError(
-        tensorstore::StrCat("Rank is ", info.full_rank,
-                            ", but schema specifies rank of ", schema.rank()));
+    if (info.full_rank != schema.rank()+1) {
+      return absl::FailedPreconditionError(
+          tensorstore::StrCat("Rank is ", info.full_rank,
+                              ", but schema specifies rank of ", schema.rank()));
+    }
   }
 
   if (auto dtype = schema.dtype();
