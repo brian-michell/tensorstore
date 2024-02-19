@@ -256,6 +256,7 @@ Result<std::shared_ptr<const void>> DataCache::GetResizedMetadata(
 
 internal::ChunkGridSpecification DataCache::GetChunkGridSpecification(
     const ZarrMetadata& metadata) {
+  bool as_byte_array = metadata.dtype.fields.back().name == "";
   std::size_t num_fields = metadata.dtype.fields.size();
   internal::ChunkGridSpecification::ComponentList components;
   components.reserve(num_fields);
