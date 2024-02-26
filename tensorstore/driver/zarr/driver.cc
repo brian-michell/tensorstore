@@ -130,7 +130,7 @@ TENSORSTORE_DEFINE_JSON_DEFAULT_BINDER(
                 },
                 DimensionSeparatorJsonBinder))),
         jb::Member("field", jb::Projection<&ZarrDriverSpec::selected_field>(
-                                jb::DefaultValue<jb::kNeverIncludeDefaults>(
+                                jb::DefaultValue<jb::kAlwaysIncludeDefaults>(
                                     [](auto* obj) { *obj = std::string{}; }))),
         jb::Initialize([](auto* obj) {
           TENSORSTORE_ASSIGN_OR_RETURN(auto info, obj->GetSpecInfo());
