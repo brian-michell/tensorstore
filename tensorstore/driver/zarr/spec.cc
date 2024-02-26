@@ -494,8 +494,8 @@ Result<std::size_t> GetFieldIndex(const ZarrDType& dtype,
                                   const SelectedField& selected_field) {
   if (selected_field.empty()) {
     if (dtype.fields.size() != 1) {
-      return absl::FailedPreconditionError(tensorstore::StrCat(
-          "Must specify a \"field\" that is one of: ", GetFieldNames(dtype)));
+      // return absl::FailedPreconditionError(tensorstore::StrCat(
+      //     "Must specify a \"field\" that is one of: ", GetFieldNames(dtype)));
     }
     return 0;
   }
