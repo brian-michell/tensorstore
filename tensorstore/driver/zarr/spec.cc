@@ -502,7 +502,6 @@ std::string GetFieldNames(const ZarrDType& dtype) {
 
 Result<std::size_t> GetFieldIndex(const ZarrDType& dtype,
                                   const SelectedField& selected_field) {
-  std::cout << selected_field << std::endl;
   if (selected_field.empty()) {
     if (dtype.fields.size() != 1) {
       // return absl::FailedPreconditionError(tensorstore::StrCat(
