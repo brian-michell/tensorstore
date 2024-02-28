@@ -308,6 +308,16 @@ Result<SpecRankAndFieldInfo> GetSpecRankAndFieldInfo(
     TENSORSTORE_ASSIGN_OR_RETURN(
         size_t field_index, GetFieldIndex(*metadata.dtype, selected_field));
     info.field = &metadata.dtype->fields[field_index];
+
+    // This should only be the case on structured data with no field supplied
+    // For some reason this is a two pass operation and full_rank seems to only get set the second pass
+    if (info.field->name != selected_field && info.full_rank >= 0) {
+      // I feel like we really will want to mutate the ZarrPartialMetadata here... It won't be pretty
+      std::cout << "field name: " << info.field->name << " does not equal selected field " << selected_field << std::endl;
+      // info.field->name = selected_field; // Set name to empty
+      ZarrPartialMetadata& mutable_metadata = const_cast<ZarrPartialMetadata&>(metadata);
+      ++mutable_metadata.rank;
+    }
   }
 
   TENSORSTORE_RETURN_IF_ERROR(ValidateSpecRankAndFieldInfo(info));
