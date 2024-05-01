@@ -1048,6 +1048,32 @@ TEST(ZarrDriverTest, CreateBigEndianUnaligned) {
       }));
 }
 
+TEST(ZarrDriverTest, CreateWithoutField) {
+    ::nlohmann::json json_spec{
+      {"driver", "zarr"},
+      {"kvstore",
+       {
+           {"driver", "file"},
+           {"path", "structarray"},
+       }},
+      {"field", "y"},
+      {"metadata",
+       {
+           {"compressor", {{"id", "blosc"}}},
+           {"dtype", ::nlohmann::json::array_t{{"x", "|b1"}, {"y", "<i2"}}},
+           {"shape", {100, 100}},
+           {"chunks", {3, 2}},
+       }},
+  };
+  auto spec = tensorstore::Spec::FromJson(json_spec).value();
+  auto store1 = tensorstore::Open(spec, (tensorstore::OpenMode::create | tensorstore::OpenMode::delete_existing));
+  ASSERT_TRUE(store1.status().ok()) << store1.status();
+  json_spec.erase("field");
+  spec = tensorstore::Spec::FromJson(json_spec).value();
+  auto store2 = tensorstore::Open(json_spec, (tensorstore::OpenMode::create | tensorstore::OpenMode::delete_existing));
+  ASSERT_TRUE(store2.status().ok()) << store2.status();
+}
+
 TEST(ZarrDriverTest, CreateLittleEndianUnaligned) {
   ::nlohmann::json json_spec{
       {"driver", "zarr"},
