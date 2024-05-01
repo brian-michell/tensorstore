@@ -493,9 +493,34 @@ std::string GetFieldNames(const ZarrDType& dtype) {
 Result<std::size_t> GetFieldIndex(const ZarrDType& dtype,
                                   const SelectedField& selected_field) {
   if (selected_field.empty()) {
-    if (dtype.fields.size() != 1) {
-      return absl::FailedPreconditionError(tensorstore::StrCat(
-          "Must specify a \"field\" that is one of: ", GetFieldNames(dtype)));
+    if (dtype.has_fields) {
+
+      // If there is an un-named field, our synthetic byte field has been added.
+      // In the case that there was no selected field and only one field, we should
+      // deal with it like a normal data type.
+      if (dtype.fields.back().name == "" || dtype.fields.size() == 1) {
+        return dtype.fields.size() - 1;
+      }
+      // TODO: We need to update dtype to have a brand new field without breaking things
+
+      // BaseDType struct:
+      std::string encoded_dtype = "|V3"; // TODO: Fix hardcode
+      DataType dt = dtype_v<std::byte>;
+      tensorstore::endian endian = tensorstore::endian::native;
+      std::vector<Index> flexible_shape = {1};
+
+      // Field struct:
+      std::vector<Index> outer_shape = {1};
+      std::string name = "";
+      std::vector<Index> field_shape = {1};
+      Index num_inner_elements = 0;
+      Index byte_offset = 0;
+      Index num_bytes = 3;
+      ZarrDType::Field field = {encoded_dtype, dt, endian, flexible_shape, outer_shape, name, field_shape, num_inner_elements, byte_offset, num_bytes};
+
+      auto& dtype_non_const = const_cast<ZarrDType&>(dtype);
+      dtype_non_const.fields.push_back(field);
+      return dtype_non_const.fields.size() - 1;
     }
     return 0;
   }
