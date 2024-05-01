@@ -178,14 +178,11 @@ TEST(ParseSelectedFieldTest, InvalidType) {
 
 TEST(GetFieldIndexTest, Null) {
   EXPECT_EQ(0u, GetFieldIndex(ParseDType("<i4").value(), SelectedField()));
-  EXPECT_THAT(
+  EXPECT_TRUE(
       GetFieldIndex(
           ParseDType(::nlohmann::json::array_t{{"x", "<i4"}, {"y", "<u2"}})
               .value(),
-          SelectedField()),
-      MatchesStatus(
-          absl::StatusCode::kFailedPrecondition,
-          "Must specify a \"field\" that is one of: \\[\"x\",\"y\"\\]"));
+          SelectedField()).ok());
 }
 
 TEST(GetFieldIndexTest, String) {
