@@ -269,7 +269,8 @@ Result<std::vector<SharedArray<const void>>> ParseFillValue(
 
 ::nlohmann::json EncodeFillValue(
     const ZarrDType& dtype, span<const SharedArray<const void>> fill_values) {
-  assert(dtype.fields.size() == static_cast<size_t>(fill_values.size()));
+  assert(dtype.fields.size() == static_cast<size_t>(fill_values.size()) || 
+         dtype.fields.back().name == "");
   if (!dtype.has_fields) {
     assert(dtype.fields.size() == 1);
     const auto& field = dtype.fields[0];
