@@ -503,19 +503,24 @@ Result<std::size_t> GetFieldIndex(const ZarrDType& dtype,
       }
       // TODO: We need to update dtype to have a brand new field without breaking things
 
+      std::size_t numBytes = 0;
+      for (const auto& field : dtype.fields) {
+        numBytes += field.num_bytes;
+      }
+
       // BaseDType struct:
-      std::string encoded_dtype = "|V3"; // TODO: Fix hardcode
+      std::string encoded_dtype = "|V" + std::to_string(numBytes);
       DataType dt = dtype_v<std::byte>;
       tensorstore::endian endian = tensorstore::endian::native;
-      std::vector<Index> flexible_shape = {1};
+      std::vector<Index> flexible_shape; // This appears to be permissible to be left empty
 
       // Field struct:
-      std::vector<Index> outer_shape = {1};
+      std::vector<Index> outer_shape; // This appears to be permissible to be left empty
       std::string name = "";
-      std::vector<Index> field_shape = {1};
+      std::vector<Index> field_shape; // This is derived from outer_shape and flexible_shape (empty)
       Index num_inner_elements = 0;
       Index byte_offset = 0;
-      Index num_bytes = 3;
+      Index num_bytes = numBytes;
       ZarrDType::Field field = {encoded_dtype, dt, endian, flexible_shape, outer_shape, name, field_shape, num_inner_elements, byte_offset, num_bytes};
 
       auto& dtype_non_const = const_cast<ZarrDType&>(dtype);
