@@ -256,8 +256,11 @@ Result<std::shared_ptr<const void>> DataCache::GetResizedMetadata(
 
 internal::ChunkGridSpecification DataCache::GetChunkGridSpecification(
     const ZarrMetadata& metadata) {
-  bool as_byte_array = metadata.dtype.fields.back().name == "";
-  std::size_t num_fields = metadata.dtype.fields.size();
+  const bool as_byte_array = metadata.dtype.fields.back().name == "";
+  if (as_byte_array) {
+    std::cout << "AS BYTE ARRAY!\n";
+  }
+  const std::size_t num_fields = metadata.dtype.fields.size();
   internal::ChunkGridSpecification::ComponentList components;
   components.reserve(num_fields);
   std::vector<DimensionIndex> chunked_to_cell_dimensions(
@@ -275,9 +278,16 @@ internal::ChunkGridSpecification DataCache::GetChunkGridSpecification(
       fill_value = AllocateArray(span<const Index, 0>{}, c_order, value_init,
                                  field.dtype);
     }
+
     assert(fill_value.rank() <=
            static_cast<DimensionIndex>(field.field_shape.size()));
-    const DimensionIndex cell_rank = field_layout.full_chunk_shape().size();
+    DimensionIndex cell_rank;
+    if (field_i == num_fields-1) {
+      cell_rank = 2;
+    } else {
+      cell_rank = field_layout.full_chunk_shape().size();
+    }
+    // const DimensionIndex cell_rank = field_layout.full_chunk_shape().size();
     SharedArray<const void> chunk_fill_value;
     chunk_fill_value.layout().set_rank(cell_rank);
     chunk_fill_value.element_pointer() = fill_value.element_pointer();
@@ -285,7 +295,7 @@ internal::ChunkGridSpecification DataCache::GetChunkGridSpecification(
     //TODO: Hardcoded!
     for (DimensionIndex cell_dim = 0; cell_dim < fill_value_start_dim;
          ++cell_dim) {
-    if (field_i == 3) {
+    if (field_i == 3 && as_byte_array) {
       // TODO: Hardcoded!
       chunk_fill_value.shape()[cell_dim] = 3-cell_dim; 
     } else {
