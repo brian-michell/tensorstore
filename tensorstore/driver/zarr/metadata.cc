@@ -609,6 +609,24 @@ bool IsMetadataCompatible(const ZarrMetadata& a, const ZarrMetadata& b) {
   for (const auto& [key, value] : b.extra_members) {
     b_json.erase(key);
   }
+  
+  if(!a.dtype.has_fields && b.dtype.has_fields){
+    // we might mutate the dtype in memory (different than the store)
+    // if this is the case, then the metadata maybe compatible.
+    if(a.dtype.fields[0].dtype == dtype_v<dtypes::byte_t>) {
+        Index num_bytes = 0;
+        for(auto f: b.dtype.fields) {
+          num_bytes += f.num_bytes;
+        }
+        if(a.dtype.fields[0].num_bytes == num_bytes){
+          a_json.erase("dtype");
+          b_json.erase("dtype");
+
+          a_json.erase("fill_value");
+          b_json.erase("fill_value");
+        }
+    }
+  }
 
   return a_json == b_json;
 }

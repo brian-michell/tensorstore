@@ -492,6 +492,54 @@ class ZarrDriver::OpenState : public ZarrDriver::OpenStateBase {
         spec().metadata_key);
   }
 
+  /// The concept here is to create a new metadata object that has the
+  /// the dtype change such that we can create new driver for loading 
+  /// byte arrays. It copies the metadata and updates the dtype, fill_value,
+  /// and chunk_layout.
+  Result<std::shared_ptr<void>> AsByteArray(
+    const void* metadata_ptr, OpenMode open_mode) override {
+    const auto& metadata = *static_cast<const ZarrMetadata*>(metadata_ptr);
+    
+    if(metadata.dtype.fields.size() == 1 && metadata.dtype.fields[0].dtype != tensorstore::dtype_v<std::byte>) {
+      return absl::InvalidArgumentError(
+        "Trying to convert dtype rank 1 to byte array, but dtype is not std::byte"
+      );
+    }
+    
+    ZarrMetadata new_metadata(metadata);
+    new_metadata.dtype = ParseDType("|V" + getDtypeTotalBytes(metadata_ptr)).value();
+
+    auto field = new_metadata.dtype.fields[0];
+    new_metadata.fill_value = std::vector<SharedArray<const void>>(
+      {
+        AllocateArray(
+          field.field_shape, ContiguousLayoutOrder::c,
+          value_init, field.dtype
+        )        
+      }
+    );
+
+    TENSORSTORE_ASSIGN_OR_RETURN(
+      new_metadata.chunk_layout, ComputeChunkLayout(
+        new_metadata.dtype, ContiguousLayoutOrder::c, new_metadata.chunks
+      )    
+    )
+
+    return std::make_shared<ZarrMetadata>(new_metadata);
+  }
+
+  std::string getDtypeTotalBytes(const void* metadata_ptr) {
+    const auto& metadata = *static_cast<const ZarrMetadata*>(metadata_ptr);
+
+    // TODO: Ensure that fields of rank > 1 are handled
+    int bytes = 0;
+    for(auto field : metadata.dtype.fields) {
+      bytes += field.num_bytes;
+    }
+
+    return std::to_string(bytes);
+  }
+
   Result<size_t> GetComponentIndex(const void* metadata_ptr,
                                    OpenMode open_mode) override {
     const auto& metadata = *static_cast<const ZarrMetadata*>(metadata_ptr);

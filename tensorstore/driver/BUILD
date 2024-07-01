@@ -17,8 +17,6 @@ DRIVERS = [
     "image/webp",
     "image/bmp",
     "json",
-    "n5",
-    "neuroglancer_precomputed",
     "stack",
     "virtual_chunked",
     "zarr",
