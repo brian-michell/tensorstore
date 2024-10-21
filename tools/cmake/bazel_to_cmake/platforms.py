@@ -30,6 +30,7 @@ _CMAKE_COMPILER_ID_TO_BAZEL_COMPILER: Dict[str, str] = {
     "AppleClang": "clang",
     "Clang": "clang",
     "MSVC": "msvc-cl",
+    "IntelLLVM": "icpx",
 }
 """Maps `CMAKE_CXX_COMPILER_ID` -> "@bazel_tools//tools/cpp:compiler" flag."""
 
@@ -143,3 +144,7 @@ def add_platform_constraints(workspace: Workspace) -> None:
     # Bazel defines this by default.  In practice, heavy use of C++ templates
     # can cause compilation to fail without this flag.
     workspace.copts.append("/bigobj")
+
+  if bazel_compiler == "IntelLLVM":
+        # Add the flags from the CMake command
+        workspace.copts.extend(["-mssse3", "-mpclmul"])
