@@ -46,7 +46,7 @@
 #include "tensorstore/contiguous_layout.h"
 #include "tensorstore/data_type.h"
 #include "tensorstore/driver/zarr/dtype.h"
-// #include "tensorstore/driver/zarr3/default_nan.h"
+#include "tensorstore/driver/zarr3/default_nan.h"
 #include "tensorstore/index.h"
 #include "tensorstore/internal/data_type_endian_conversion.h"
 #include "tensorstore/internal/flat_cord_builder.h"
@@ -103,7 +103,7 @@ Result<T> DecodeFloat(const nlohmann::json& j) {
   if (j.is_string()) {
     const auto& j_str = j.get_ref<std::string const&>();
     if (j_str == "NaN") {
-      // return internal_zarr3::GetDefaultNaN<T>();
+      return internal_zarr3::GetDefaultNaN<T>();
     } else if (j_str == "Infinity") {
       return std::numeric_limits<T>::infinity();
     } else if (j_str == "-Infinity") {
