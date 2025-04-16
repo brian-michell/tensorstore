@@ -194,7 +194,6 @@ tensorstore_cc_test(
         "//tensorstore/driver:driver_testutil",
         "//tensorstore/driver/array",
         "//tensorstore/driver/cast",
-        "//tensorstore/driver/n5",
         "//tensorstore/driver/zarr",
         "//tensorstore/index_space:dim_expression",
         "//tensorstore/index_space:index_transform",

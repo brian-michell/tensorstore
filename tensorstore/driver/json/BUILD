@@ -88,7 +88,6 @@ tensorstore_cc_test(
         "//tensorstore:spec",
         "//tensorstore:transaction",
         "//tensorstore/driver:driver_testutil",
-        "//tensorstore/driver/n5",
         "//tensorstore/index_space:dim_expression",
         "//tensorstore/internal:global_initializer",
         "//tensorstore/internal:parse_json_matches",

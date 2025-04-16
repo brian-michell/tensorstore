@@ -10,17 +10,10 @@ DRIVERS = [
     "array",
     "cast",
     "downsample",
-    "image/avif",
-    "image/jpeg",
-    "image/png",
-    "image/tiff",
-    "image/webp",
-    "image/bmp",
     "json",
     "stack",
     "virtual_chunked",
     "zarr",
-    "zarr3",
 ]
 
 DOCTEST_SOURCES = glob([

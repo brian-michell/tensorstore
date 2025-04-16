@@ -15,7 +15,6 @@ DRIVER_DOCS = [
     "ocdbt",
     "s3",
     "tsgrpc",
-    "zarr3_sharding_indexed",
     "zip",
 ]
 

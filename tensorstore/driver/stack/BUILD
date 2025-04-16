@@ -80,43 +80,6 @@ tensorstore_cc_library(
 )
 
 tensorstore_cc_test(
-    name = "driver_test",
-    size = "small",
-    srcs = ["driver_test.cc"],
-    deps = [
-        ":stack",
-        "//tensorstore",
-        "//tensorstore:array",
-        "//tensorstore:array_testutil",
-        "//tensorstore:box",
-        "//tensorstore:context",
-        "//tensorstore:data_type",
-        "//tensorstore:index",
-        "//tensorstore:open",
-        "//tensorstore:open_mode",
-        "//tensorstore:progress",
-        "//tensorstore:schema",
-        "//tensorstore:strided_layout",
-        "//tensorstore:transaction",
-        "//tensorstore/driver/array",
-        "//tensorstore/driver/n5",
-        "//tensorstore/driver/zarr3",
-        "//tensorstore/index_space:dim_expression",
-        "//tensorstore/index_space:index_transform",
-        "//tensorstore/internal:json_gtest",
-        "//tensorstore/kvstore",
-        "//tensorstore/kvstore/memory",
-        "//tensorstore/util:result",
-        "//tensorstore/util:status_testutil",
-        "//tensorstore/util:unit",
-        "@com_github_nlohmann_json//:json",
-        "@com_google_absl//absl/status",
-        "@com_google_absl//absl/strings",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-tensorstore_cc_test(
     name = "integration_test",
     srcs = ["integration_test.cc"],
     deps = [
@@ -131,8 +94,6 @@ tensorstore_cc_test(
         "//tensorstore:open",
         "//tensorstore:open_mode",
         "//tensorstore:progress",
-        "//tensorstore/driver/image/png",  # build_cleaner: keep
-        "//tensorstore/driver/neuroglancer_precomputed",  # build_cleaner: keep
         "//tensorstore/index_space:dim_expression",
         "//tensorstore/kvstore",
         "//tensorstore/kvstore/memory",  # build_cleaner: keep
